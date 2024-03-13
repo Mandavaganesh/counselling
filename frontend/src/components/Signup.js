@@ -17,6 +17,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import axios from 'axios';
+import{useNavigate}from'react-router-dom'
 
 function Copyright(props) {
   return (
@@ -36,28 +37,30 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  const navigate=useNavigate()
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       name: data.get('name'),
-      role: data.get('role'),
+      Gender: data.get('gender'),
       email: data.get('email'),
       password: data.get('password'),
     });
     axios.post('http://localhost:8080/register',{
       name: data.get('name'),
-      role: data.get('role'),
+      Gender: data.get('gender'),
       email: data.get('email'),
       password: data.get('password'),
     }).then(res=>{
       console.log(res.data)
     })
+    navigate('/success')
   };
-  const [role, setRole] = React.useState('');
+  const [gender, setGender] = React.useState('');
 
   const handleChange = (event) => {
-    setRole(event.target.value);
+    setGender(event.target.value);
   };
 
   return (
@@ -94,19 +97,19 @@ export default function SignUp() {
               <Grid item xs={12} sm={6}>
               <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Role</InputLabel>
+        <InputLabel id="demo-simple-select-label">Gender</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          name='role'
-          value={role}
-          label="Role"
+          name='gender'
+          value={gender}
+          label="Gender"
           onChange={handleChange}
         >
-          <MenuItem value={1}>Councellor</MenuItem>
-          <MenuItem value={2}>Admin</MenuItem>
-          <MenuItem value={3}>Students</MenuItem>
-          <MenuItem value={4}>Visitor</MenuItem>
+          <MenuItem value={1}>male</MenuItem>
+          <MenuItem value={2}>female</MenuItem>
+          {/* <MenuItem value={3}>Congress</MenuItem>
+          <MenuItem value={4}>Janasena</MenuItem> */}
         </Select>
       </FormControl>
     </Box>
