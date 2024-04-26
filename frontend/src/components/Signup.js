@@ -17,6 +17,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import axios from 'axios';
+import{useNavigate}from'react-router-dom'
 
 function Copyright(props) {
   return (
@@ -36,28 +37,47 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  const navigate=useNavigate()
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const name = data.get('name');
+    const gender = data.get('gender');
+    const email = data.get('email');
+    const password = data.get('password');
+
+    // Password validation: At least 6 characters and contains at least one number
+    const passwordRegex = /^(?=.*\d).{6,}$/;
+
+    if (!passwordRegex.test(password)) {
+      console.log("Password must be at least 6 characters and contain at least one number");
+      return; // Prevent submission if password is invalid
+    }
+
     console.log({
-      name: data.get('name'),
-      role: data.get('role'),
-      email: data.get('email'),
-      password: data.get('password'),
+      name: name,
+      gender: gender,
+      email: email,
+      password: password,
     });
-    axios.post('http://localhost:8080/register',{
-      name: data.get('name'),
-      role: data.get('role'),
-      email: data.get('email'),
-      password: data.get('password'),
-    }).then(res=>{
-      console.log(res.data)
-    })
+
+    axios.post('http://localhost:8080/register', {
+      name: name,
+      gender: gender,
+      email: email,
+      password: password,
+    }).then(res => {
+      console.log(res.data);
+    });
+
+    navigate('/Success');
   };
-  const [role, setRole] = React.useState('');
+
+  const [gender, setGender] = React.useState('');
 
   const handleChange = (event) => {
-    setRole(event.target.value);
+    setGender(event.target.value);
   };
 
   return (
@@ -94,19 +114,19 @@ export default function SignUp() {
               <Grid item xs={12} sm={6}>
               <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Role</InputLabel>
+        <InputLabel id="demo-simple-select-label">Gender</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          name='role'
-          value={role}
-          label="Role"
+          name='gender'
+          value={gender}
+          label="Gender"
           onChange={handleChange}
         >
-          <MenuItem value={1}>Councellor</MenuItem>
-          <MenuItem value={2}>Admin</MenuItem>
-          <MenuItem value={3}>Students</MenuItem>
-          <MenuItem value={4}>Visitor</MenuItem>
+          <MenuItem value={1}>male</MenuItem>
+          <MenuItem value={2}>female</MenuItem>
+          {/* <MenuItem value={3}>Congress</MenuItem>
+          <MenuItem value={4}>Janasena</MenuItem> */}
         </Select>
       </FormControl>
     </Box>
@@ -119,6 +139,17 @@ export default function SignUp() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="AadharNumber"
+                  label="AadharNumber"
+                  type="AadharNumber"
+                  id="AadharNumber"
+                  autoComplete="new-password"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -149,7 +180,7 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="Signin" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>
