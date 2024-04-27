@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -27,21 +26,37 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
+function isValidEmail(email) {
+  // Regular expression for basic email validation
+  // Adapted from https://emailregex.com/
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
+}
 
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
   const navigate=useNavigate()
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-    navigate('/Polling')
+    const email = data.get('email');
+    const password = data.get('password');
 
+    if (!isValidEmail(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    if (password.length < 6) {
+      alert('Password must be at least 6 characters long.');
+      return;
+    }
+
+    // If email and password are valid, proceed with signup
+    console.log({ email, password });
+    navigate('/Polling');
   };
 
   return (
@@ -81,7 +96,7 @@ export default function SignInSide() {
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
-                required
+                required={true}
                 fullWidth
                 id="email"
                 label="Email Address"
@@ -91,7 +106,7 @@ export default function SignInSide() {
               />
               <TextField
                 margin="normal"
-                required
+                required={true}
                 fullWidth
                 name="password"
                 label="Password"
@@ -123,7 +138,11 @@ export default function SignInSide() {
                   </Link>
                 </Grid>
               </Grid>
+              <Typography variant="body2" color="text.secondary" align="center">
+                * Email and password are required fields.
+              </Typography>
               <Copyright sx={{ mt: 5 }} />
+
             </Box>
           </Box>
         </Grid>
