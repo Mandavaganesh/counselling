@@ -4,7 +4,11 @@ const {MongoClient, ObjectId} = require('mongodb')
 
 const app=express()
 app.use(cors(
-  
+     {
+         origin: ["https://voting-jade.vercel.app/"],
+        methods: ["POST", "GET"], 
+       credentials: true
+    }
 ))
 app.use(express.json())
 const client = new MongoClient('mongodb+srv://admin:admin@voting.1zifldv.mongodb.net/?retryWrites=true&w=majority&appName=voting')
