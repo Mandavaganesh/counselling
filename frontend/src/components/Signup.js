@@ -38,25 +38,42 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
   const navigate=useNavigate()
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const name = data.get('name');
+    const gender = data.get('gender');
+    const email = data.get('email');
+    const password = data.get('password');
+
+    // Password validation: At least 6 characters and contains at least one number
+    const passwordRegex = /^(?=.*\d).{6,}$/;
+
+    if (!passwordRegex.test(password)) {
+      console.log("Password must be at least 6 characters and contain at least one number");
+      return; // Prevent submission if password is invalid
+    }
+
     console.log({
-      name: data.get('name'),
-      Gender: data.get('gender'),
-      email: data.get('email'),
-      password: data.get('password'),
+      name: name,
+      gender: gender,
+      email: email,
+      password: password,
     });
-    axios.post('http://localhost:8080/register',{
-      name: data.get('name'),
-      Gender: data.get('gender'),
-      email: data.get('email'),
-      password: data.get('password'),
-    }).then(res=>{
-      console.log(res.data)
-    })
-    navigate('/success')
+
+    axios.post('http://localhost:8080/register', {
+      name: name,
+      gender: gender,
+      email: email,
+      password: password,
+    }).then(res => {
+      console.log(res.data);
+    });
+
+    navigate('/Success');
   };
+
   const [gender, setGender] = React.useState('');
 
   const handleChange = (event) => {
@@ -128,6 +145,17 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
+                  name="AadharNumber"
+                  label="AadharNumber"
+                  type="AadharNumber"
+                  id="AadharNumber"
+                  autoComplete="new-password"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
                   name="password"
                   label="Password"
                   type="password"
@@ -152,7 +180,7 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="Signin" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>
