@@ -3,13 +3,14 @@ const cors = require('cors')
 const {MongoClient, ObjectId} = require('mongodb')
 
 const app=express()
-app.use(cors())
+app.use(cors(
+  
+))
 app.use(express.json())
 const client = new MongoClient('mongodb+srv://admin:admin@voting.1zifldv.mongodb.net/?retryWrites=true&w=majority&appName=voting')
 client.connect()
 const db = client.db('counselling1')
 const col = db.collection('Register')
-//col.insertOne({'student':"123"})
 
 app.post('/register', async (req, res) => {
     try {
@@ -29,9 +30,9 @@ app.get('/retrieve',async (req,res)=>{
 
 app.put('/users/:id',async(req,res)=>{
     const {id}=req.params
-    const{name,role,email,password}=req.body
+    const{name,role,email,password,AadharNumber}=req.body
     const result=col.updateOne({_id: new ObjectId(id)},
-    {$set:{name,role,email,password}})
+    {$set:{name,role,email,password,AadharNumber}})
     res.send('updated')
 })
 app.delete('/users/:id',async(req,res)=>{
