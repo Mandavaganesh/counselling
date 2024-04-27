@@ -1,70 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+const express = require('express')
+const cors = require('cors')
+const {MongoClient, ObjectId} = require('mongodb')
 
-const FetchRegistrations = () => {
-    const [res, setRes] = useState([]);
-    const [formData,setFormData]=useState({name:'',role:'',email:'',password:''})
+const app=express()
+app.use(cors())
+app.use(express.json())
+const client = new MongoClient('mongodb+srv://admin:admin@voting.1zifldv.mongodb.net/?retryWrites=true&w=majority&appName=voting')
+client.connect()
+const db = client.db('counselling1')
+const col = db.collection('Register')
 
- const fetchData= async()=>{ 
-         axios.get('http://localhost:8080/retrieve')
-            .then(response => {
-                setRes(response.data);
-                console.log(response.data);
-            })}
-            useEffect(()=>{
-                fetchData();
-            
-    }, 
-    [])
-    const updateData = async (id) => {
-        const response = await axios.put(`http://localhost:8080/users/${id}`, formData)
-        fetchData();
-        console.log(response.data);
-}
-const handleDelete=async (id)=>{
-    await axios.delete(`http://localhost:8080/users/${id}`)
-    .then((response)=>{
-        console.log(response.data)
-    })
-    fetchData();
-}
+app.post('/register', async (req, res) => {
+    try {
+        await col.insertOne(req.body);
+        res.send('inserted successfully');
+    } catch (error) {
+        console.error('Error occurred during registration:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
-const onChangeHandler=(e)=>{
-    setFormData({...formData,[e.target.name]:e.target.value});
-};
+app.get('/retrieve',async (req,res)=>{
+    const result = await col.find().toArray()
+    console.log(result)
+    res.send(result)
+})
 
-    return ( 
-        <center>
-        <table border={1}>
-                <tr>
-                    <th>Id</th>
-                    <th>Role</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Password</th>
-                </tr>
-                {res.map((item,index) =>{
-                    return(
-                        <tr key={index}>
-                          <td>{item._id}</td>
-                          <td>{item.role}</td>
-                          <td>{item.name}</td>
-                          <td>{item.email}</td>
-                          <td>{item.password}</td>
-                        <td>
-                        <input type='text' name='name' placeholder='New Name' onChange={onChangeHandler} />
-                        <input type='text' name='role' placeholder='New Role' onChange={onChangeHandler} />
-                        <input type='text' name='email' placeholder='New Email' onChange={onChangeHandler} />
-                        <input type='text' name='password' placeholder='New Password' onChange={onChangeHandler} />
-                        <button onClick={()=>updateData(item._id)}>update</button>
-                        <button onClick={()=>handleDelete(item._id)}>delete</button>
-                        </td>
-                    </tr>
-                    )
-                })}           
-        </table>
-        </center>
-    );
-};
+app.put('/users/:id',async(req,res)=>{
+    const {id}=req.params
+    const{name,role,email,password,AadharNumber}=req.body
+    const result=col.updateOne({_id: new ObjectId(id)},
+    {$set:{name,role,email,password,AadharNumber}})
+    res.send('updated')
+})
+app.delete('/users/:id',async(req,res)=>{
+    const {id}=req.params
+    const result=await col.deleteOne({_id:new ObjectId(id)})
+    res.json({message:"deleted successfully"})
+});
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    console.log(req.body);
+    const user = await col.findOne({ email });
+    if (!user || !(password === user.password)) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    res.json({username: user.name})
+    console.log(user.email, user.password, password); 
+    
+})
 
-export default FetchRegistrations;
+
+app.get('/',(req,res)=>{
+    res.send('<h1><center>Hello World</center></h1>')
+})
+app.get('/about',(req,res)=>{
+    res.send('<h1><center>This is about page</center></h1>')
+})
+app.listen('8080', ()=>{
+    console.log('server is running')
+})
