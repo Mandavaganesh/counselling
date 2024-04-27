@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import{useNavigate}from'react-router-dom'
 
 const Polling = () => {
@@ -25,7 +26,19 @@ const Polling = () => {
     navigate('/Submit')
 
   };
-
+  const handleLogout = async () => {
+    try {
+      await axios.post('/api/logout'); // Assuming your logout route is '/api/logout'
+      // Perform any additional client-side cleanup if necessary
+      // For example, clear local storage, reset state, etc.
+      localStorage.removeItem('token'); // If using JWT
+      // Redirect the user to the login page or any other appropriate page
+      window.location.href = '/Signin';
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+    navigate('/Signin')
+  };
   return (
     <div style={{ 
       backgroundImage: "url(https://www.shutterstock.com/image-photo/image-girl-smartphone-hands-she-260nw-753157075.jpg)",
@@ -43,6 +56,7 @@ const Polling = () => {
         padding: '20px',
         borderRadius: '10px',
       }}>
+        
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <input type="radio" id="party1" name="selectedParty" value="party1" checked={selectedParty === 'party1'} onChange={() => handlePartySelect('party1')} />
           <label htmlFor="party1" style={{ marginRight: '10px' }}>{party1.name}</label>
@@ -65,6 +79,8 @@ const Polling = () => {
         </div>
         <button type="submit">Submit</button>
       </form>
+      <button onClick={handleLogout}>Logout</button>
+
     </div>
 
     
